@@ -3,7 +3,7 @@ from langchain.agents import initialize_agent
 from langchain.llms import OpenAI
 from langchain.chat_models import ChatOpenAI
 from langchain.tools.selection_inference.tool import SelectionInference
-from langchain.tools.human import HumanInputRun
+from langchain.tools.human.tool import HumanInputRun
 from langchain.tools.interaction.tool import StdInInquireTool
 from langchain.tools.llm_tool.tool import LLMTool
 
