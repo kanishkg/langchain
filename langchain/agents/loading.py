@@ -10,6 +10,7 @@ from langchain.agents.chat.base import ChatAgent
 from langchain.agents.conversational.base import ConversationalAgent
 from langchain.agents.conversational_chat.base import ConversationalChatAgent
 from langchain.agents.mrkl.base import ZeroShotAgent
+from langchain.agents.mrkl.base import ZeroShotFactorAgent
 from langchain.agents.react.base import ReActDocstoreAgent
 from langchain.agents.self_ask_with_search.base import SelfAskWithSearchAgent
 from langchain.agents.tools import Tool
@@ -19,6 +20,7 @@ from langchain.utilities.loading import try_load_from_hub
 
 AGENT_TO_CLASS = {
     "zero-shot-react-description": ZeroShotAgent,
+    "zero-shot-factor": ZeroShotFactorAgent,
     "react-docstore": ReActDocstoreAgent,
     "self-ask-with-search": SelfAskWithSearchAgent,
     "conversational-react-description": ConversationalAgent,

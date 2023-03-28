@@ -35,6 +35,7 @@ class Agent(BaseModel):
 
     llm_chain: LLMChain
     allowed_tools: Optional[List[str]] = None
+    worker_level: int = 0
     return_values: List[str] = ["output"]
 
     @abstractmethod

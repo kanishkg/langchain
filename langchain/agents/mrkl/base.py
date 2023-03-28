@@ -5,7 +5,7 @@ import re
 from typing import Any, Callable, List, NamedTuple, Optional, Sequence, Tuple
 
 from langchain.agents.agent import Agent, AgentExecutor
-from langchain.agents.mrkl.prompt import FORMAT_INSTRUCTIONS, PREFIX, SUFFIX
+from langchain.agents.mrkl.prompt import FORMAT_INSTRUCTIONS, PREFIX, SUFFIX, PREFIX_FACTOR, SUFFIX_FACTOR, FORMAT_INSTRUCTIONS_FACTOR
 from langchain.agents.tools import Tool
 from langchain.callbacks.base import BaseCallbackManager
 from langchain.chains import LLMChain
@@ -136,6 +136,96 @@ class ZeroShotAgent(Agent):
 
     def _extract_tool_and_input(self, text: str) -> Optional[Tuple[str, str]]:
         return get_action_and_input(text)
+
+
+class ZeroShotFactorAgent(Agent):
+    """Agent for the factorn chain."""
+
+    @property
+    def _agent_type(self) -> str:
+        """Return Identifier of agent type."""
+        return "zero-shot-factor-description"
+
+    @property
+    def observation_prefix(self) -> str:
+        """Prefix to append the observation with."""
+        return "Observation: "
+
+    @property
+    def llm_prefix(self) -> str:
+        """Prefix to append the llm call with."""
+        return "Thought:"
+
+    @classmethod
+    def create_prompt(
+        cls,
+        tools: Sequence[BaseTool],
+        prefix: str = PREFIX_FACTOR,
+        suffix: str = SUFFIX_FACTOR,
+        format_instructions: str = FORMAT_INSTRUCTIONS_FACTOR,
+        input_variables: Optional[List[str]] = None,
+    ) -> PromptTemplate:
+        """Create prompt in the style of the zero shot agent.
+
+        Args:
+            tools: List of tools the agent will have access to, used to format the
+                prompt.
+            prefix: String to put before the list of tools.
+            suffix: String to put after the list of tools.
+            input_variables: List of input variables the final prompt will expect.
+
+        Returns:
+            A PromptTemplate with the template assembled from the pieces here.
+        """
+        tool_strings = "\n".join([f"{tool.name}: {tool.description}" for tool in tools])
+        tool_names = ", ".join([tool.name for tool in tools])
+        format_instructions = format_instructions.format(tool_names=tool_names)
+        template = "\n\n".join([prefix, tool_strings, format_instructions, suffix])
+        if input_variables is None:
+            input_variables = ["input", "agent_scratchpad"]
+        return PromptTemplate(template=template, input_variables=input_variables)
+
+    @classmethod
+    def from_llm_and_tools(
+        cls,
+        llm: BaseLLM,
+        tools: Sequence[BaseTool],
+        callback_manager: Optional[BaseCallbackManager] = None,
+        prefix: str = PREFIX,
+        suffix: str = SUFFIX,
+        format_instructions: str = FORMAT_INSTRUCTIONS,
+        input_variables: Optional[List[str]] = None,
+        **kwargs: Any,
+    ) -> Agent:
+        """Construct an agent from an LLM and tools."""
+        cls._validate_tools(tools)
+        prompt = cls.create_prompt(
+            tools,
+            prefix=prefix,
+            suffix=suffix,
+            format_instructions=format_instructions,
+            input_variables=input_variables,
+        )
+        llm_chain = LLMChain(
+            llm=llm,
+            prompt=prompt,
+            callback_manager=callback_manager,
+        )
+        tool_names = [tool.name for tool in tools]
+        return cls(llm_chain=llm_chain, allowed_tools=tool_names, **kwargs)
+
+    @classmethod
+    def _validate_tools(cls, tools: Sequence[BaseTool]) -> None:
+        for tool in tools:
+            if tool.description is None:
+                raise ValueError(
+                    f"Got a tool {tool.name} without a description. For this agent, "
+                    f"a description must always be provided."
+                )
+
+    def _extract_tool_and_input(self, text: str) -> Optional[Tuple[str, str]]:
+        return get_action_and_input(text)
+
 
 
 class MRKLChain(AgentExecutor):
