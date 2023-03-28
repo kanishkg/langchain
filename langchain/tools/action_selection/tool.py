@@ -25,7 +25,7 @@ Actions:
 class ActionSelection(BaseFactorTool):
     """Tool that allows the model to search through and evaluate actions before taking them."""
 
-    name = "Subquestions Tool"
+    name = "Action Selection Tool"
     description = (
         "A tool useful for searching through and evaluating actions before taking them."
         "Pass the question to the tool and expect an answer for which steps to take next."
@@ -53,5 +53,5 @@ class ActionSelection(BaseFactorTool):
 
     async def _arun(self, query: str) -> str:
         """Use the tool asynchronously."""
-        raise NotImplementedError("subquestions does not support async")
+        raise NotImplementedError("action selection does not support async")
 
