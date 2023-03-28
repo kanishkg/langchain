@@ -23,13 +23,13 @@ class SelectionInference(BaseFactorTool):
         "When asked a question with a lot of information, you can use this tool to find the answer. "
         "The input is passed to the selection module, which selects the relevant information."
         "The inference module then uses the selected information to infer the answer."
-        "Pass the full context and the question as a comma separated string."
-        "Eg: Action Input: <full long context here>, <question>."
+        "Pass the full context and the question as a semi-colon separated string."
+        "Eg: Action Input: <full long context here>; <question>."
     )
 
     def _run(self, query: str) -> str:
         """Use the tool."""
-        context, question = query.strip().split(",")
+        context, question = query.strip().split(";")
         prompt = SELCTION_PROMPT.format(context=context, question=question)
         selection = self.llm(prompt, stop=["Answer:", "Final Answer:", "A:"])
         inference_prompt = INFERENCE_PROMPT.format(selection=selection, question=question)

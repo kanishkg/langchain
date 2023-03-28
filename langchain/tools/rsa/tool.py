@@ -29,6 +29,7 @@ class RSA(BaseFactorTool):
         "Use this before trying to clarify with the user."
         "The tool will return the best meaning for the user query."
         "The tools uses rational speech acts to understand the user query."
+        "Use this tool only if the user query is not clear."
         "Eg: Action Input: <user utterance>"
     )
 

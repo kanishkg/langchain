@@ -1,6 +1,9 @@
 # flake8: noqa
 PREFIX = """Answer the following questions as best you can. You have access to the following tools:"""
 PREFIX_FACTOR = """Answer the following questions as best you can. If you have enough information, answer the question directly.
+Search through possible actions and evaluate them to find the best one.
+Before you ask a question to the user, you should always think about what they might answer and if it is worth asking the question.
+Split questions into smaller questions and answer them one by one.
 If not, you have access to the following tools:"""
 FORMAT_INSTRUCTIONS = """Use the following format:
 
